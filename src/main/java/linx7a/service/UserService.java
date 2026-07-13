@@ -2,10 +2,11 @@ package linx7a.service;
 
 import linx7a.model.Account;
 import linx7a.model.User;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Service
 public class UserService {
     private final List<User> users = new ArrayList<>();
     private int idCounter = 0;
