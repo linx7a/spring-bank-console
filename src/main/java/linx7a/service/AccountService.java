@@ -29,5 +29,14 @@ public class AccountService {
         return account;
     }
 
+    public Account depositAccount(int id, double moneyAmount) {
+        Account account = accounts.stream().
+                filter(a -> a.getId() == id).
+                findFirst().
+                orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+        account.deposit(moneyAmount);
+        return account;
+    }
+
 
 }
