@@ -21,6 +21,7 @@ public class AccountService {
 
 
     private int idCounter = 0;
+
     public Account createAccount(int userId) {
         User user = userService.findUserById(userId);
         idCounter++;
@@ -38,5 +39,15 @@ public class AccountService {
         return account;
     }
 
+    public Account withdrawAccount(int id, double moneyAmount) {
+        Account account = accounts.stream().
+                filter(a -> a.getId() == id).
+                findFirst().
+                orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+
+        account.withdraw(moneyAmount);
+
+        return account;
+    }
 
 }
