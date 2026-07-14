@@ -32,22 +32,46 @@ public class AccountService {
 
     public Account depositAccount(int id, double moneyAmount) {
         Account account = accounts.stream().
-                filter(a -> a.getId() == id).
-                findFirst().
-                orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+                filter(a -> a.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
         account.deposit(moneyAmount);
         return account;
     }
 
     public Account withdrawAccount(int id, double moneyAmount) {
-        Account account = accounts.stream().
-                filter(a -> a.getId() == id).
-                findFirst().
-                orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+        Account account = accounts.stream()
+                .filter(a -> a.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
 
         account.withdraw(moneyAmount);
 
         return account;
+    }
+
+    public void accountTransfer(int fromAccountId, int toAccountId, double moneyAmount) {
+        Account accountFrom = accounts.stream()
+                .filter(a -> a.getId() == fromAccountId)
+                .findFirst().
+                orElseThrow(() -> new IllegalArgumentException("Счет отправителя " + fromAccountId + " не найден"));
+
+        Account accountTo = accounts.stream().
+                filter(a -> a.getId() == toAccountId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Счет получателя " + toAccountId + " не найден"));
+
+        boolean sameUser = accountFrom.getUserId() == accountTo.getUserId();
+        double depositMoneyAmount = 0;
+
+        if (!sameUser) {
+            depositMoneyAmount = moneyAmount * (1 - accountProperties.getTransferCommission());
+        } else {
+            depositMoneyAmount = moneyAmount;
+        }
+
+        accountFrom.withdraw(moneyAmount);
+        accountTo.deposit(depositMoneyAmount);
     }
 
 }
