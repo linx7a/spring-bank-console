@@ -31,36 +31,29 @@ public class AccountService {
         return account;
     }
 
-    public Account depositAccount(int id, double moneyAmount) {
-        Account account = accounts.stream().
-                filter(a -> a.getId() == id)
+    private Account findAccountById(int id) {
+        return accounts.stream()
+                .filter(a -> a.getId() == id)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+    }
+
+    public Account depositAccount(int id, double moneyAmount) {
+        Account account = findAccountById(id);
         account.deposit(moneyAmount);
         return account;
     }
 
     public Account withdrawAccount(int id, double moneyAmount) {
-        Account account = accounts.stream()
-                .filter(a -> a.getId() == id)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
-
+        Account account = findAccountById(id);
         account.withdraw(moneyAmount);
-
         return account;
     }
 
     public void accountTransfer(int fromAccountId, int toAccountId, double moneyAmount) {
-        Account accountFrom = accounts.stream()
-                .filter(a -> a.getId() == fromAccountId)
-                .findFirst().
-                orElseThrow(() -> new IllegalArgumentException("Счет отправителя " + fromAccountId + " не найден"));
+        Account accountFrom = findAccountById(fromAccountId);
 
-        Account accountTo = accounts.stream()
-                .filter(a -> a.getId() == toAccountId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Счет получателя " + toAccountId + " не найден"));
+        Account accountTo = findAccountById(toAccountId);
 
         boolean sameUser = accountFrom.getUserId() == accountTo.getUserId();
         double depositMoneyAmount = 0;
@@ -76,10 +69,7 @@ public class AccountService {
     }
 
     public void accountClose(int id) {
-        Account account = accounts.stream()
-                .filter(a -> a.getId() == id)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+        Account account = findAccountById(id);
 
         int userId = account.getUserId();
 
@@ -88,7 +78,7 @@ public class AccountService {
                 .collect(Collectors.toList());
 
         if (allAccounts.size() == 1) {
-            throw new IllegalArgumentException("Невозможно закрыть единсвтенный счет пользователя.");
+            throw new IllegalArgumentException("Невозможно закрыть единственный счет пользователя.");
         }
 
         Account firstAccount = allAccounts.get(0);
