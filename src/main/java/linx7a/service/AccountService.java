@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -56,8 +57,8 @@ public class AccountService {
                 .findFirst().
                 orElseThrow(() -> new IllegalArgumentException("Счет отправителя " + fromAccountId + " не найден"));
 
-        Account accountTo = accounts.stream().
-                filter(a -> a.getId() == toAccountId)
+        Account accountTo = accounts.stream()
+                .filter(a -> a.getId() == toAccountId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Счет получателя " + toAccountId + " не найден"));
 
@@ -72,6 +73,28 @@ public class AccountService {
 
         accountFrom.withdraw(moneyAmount);
         accountTo.deposit(depositMoneyAmount);
+    }
+
+    public void accountClose(int id) {
+        Account account = accounts.stream()
+                .filter(a -> a.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Счет с id " + id + " не найден"));
+
+        int userId = account.getUserId();
+
+        List<Account> allAccounts = accounts.stream()
+                .filter(a -> a.getUserId() == userId)
+                .collect(Collectors.toList());
+
+        if (allAccounts.size() == 1) {
+            throw new IllegalArgumentException("Невозможно закрыть единсвтенный счет пользователя.");
+        }
+
+        Account firstAccount = allAccounts.get(0);
+        firstAccount.deposit(account.getMoneyAmount());
+
+        accounts.remove(account);
     }
 
 }
