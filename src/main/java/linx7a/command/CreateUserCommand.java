@@ -16,7 +16,7 @@ public class CreateUserCommand implements OperationCommand{
     private final Scanner scanner = new Scanner(System.in);
     @Override
     public void execute() {
-        System.out.println("Введите логин для создания пользователя");
+        System.out.println("Введите логин для создания пользователя: ");
         String login = scanner.nextLine();
         User user = userService.createUser(login);
         System.out.println("Пользователь создан: " + user);
