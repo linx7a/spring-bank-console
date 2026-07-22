@@ -29,6 +29,7 @@ public class OperationsConsoleListener implements Runnable {
                     - ACCOUNT_DEPOSIT (Пополнить счет)
                     - ACCOUNT_TRANSFER (Перевести средства)
                     - USER_CREATE (Создать пользователя)
+                    - EXIT (Выйти из программы)
                     """);
             String input = scanner.nextLine();
             try {
