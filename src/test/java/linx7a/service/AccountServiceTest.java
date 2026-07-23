@@ -85,4 +85,34 @@ public class AccountServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> accountService.accountTransfer(account1.getId(), account2.getId(), 200000));
     }
+
+    @Test
+    void closeAccount_ShouldCloseAccount() {
+        UserService userService = new UserService();
+        AccountProperties accountProperties = new AccountProperties(100, 0.02);
+        AccountService accountService = new AccountService(userService, accountProperties);
+
+        User user = userService.createUser("nastya_s_valyutoy");
+        Account account1 = accountService.createAccount(user.getId());
+        Account account2 = accountService.createAccount(user.getId());
+
+        accountService.depositAccount(account1.getId(), 650);
+        accountService.depositAccount(account2.getId(), 700);
+
+        accountService.accountClose(account2.getId());
+
+        assertEquals(1550, account1.getMoneyAmount());
+    }
+
+    @Test
+    void closeAccount_shouldThrowException_whenUserHasOnlyOneAccount() {
+        UserService userService = new UserService();
+        AccountProperties accountProperties = new AccountProperties(100, 0.02);
+        AccountService accountService = new AccountService(userService, accountProperties);
+
+        User user = userService.createUser("fedya_dvazhdy_bankrot");
+        Account account = accountService.createAccount(user.getId());
+
+        assertThrows(IllegalArgumentException.class, () -> accountService.accountClose(account.getId()));
+    }
 }
