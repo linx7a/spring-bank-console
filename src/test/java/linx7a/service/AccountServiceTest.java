@@ -47,4 +47,42 @@ public class AccountServiceTest {
         assertEquals(90, account.getMoneyAmount());
         assertThrows(IllegalArgumentException.class, () -> accountService.withdrawAccount(account.getId(),1000));
     }
+
+    @Test
+    void transferAccount_ShouldTransferMoneyBetweenAccountsOfOneUser() {
+        UserService userService = new UserService();
+        AccountProperties accountProperties = new AccountProperties(100, 0.02);
+        AccountService accountService = new AccountService(userService, accountProperties);
+
+        User user1 = userService.createUser("garik_bez_kopeyki");
+        Account account1 = accountService.createAccount(user1.getId());
+        Account account2 = accountService.createAccount(user1.getId());
+        accountService.depositAccount(account1.getId(), 7777);
+        accountService.accountTransfer(account1.getId(),account2.getId(), 777);
+
+        assertEquals(7100, account1.getMoneyAmount());
+        assertEquals(877, account2.getMoneyAmount());
+
+        assertThrows(IllegalArgumentException.class, () -> accountService.accountTransfer(account1.getId(), account2.getId(), 1000000));
+    }
+
+    @Test
+    void transferAccount_ShouldTransferMoneyBetweenAccountsOfDifferentUsers() {
+        UserService userService = new UserService();
+        AccountProperties accountProperties = new AccountProperties(100, 0.02);
+        AccountService accountService = new AccountService(userService, accountProperties);
+
+        User user1 = userService.createUser("pasha_krypto");
+        User user2 = userService.createUser("lyuda_finmonitoring");
+        Account account1 = accountService.createAccount(user1.getId());
+        Account account2 = accountService.createAccount(user2.getId());
+
+        accountService.depositAccount(account1.getId(), 8356.72);
+        accountService.accountTransfer(account1.getId(), account2.getId(), 50);
+
+        assertEquals(8406.72, account1.getMoneyAmount());
+        assertEquals(149, account2.getMoneyAmount());
+
+        assertThrows(IllegalArgumentException.class, () -> accountService.accountTransfer(account1.getId(), account2.getId(), 200000));
+    }
 }
